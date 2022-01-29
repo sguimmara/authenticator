@@ -4,4 +4,13 @@
 
 ## Getting started
 
-1. Clone this repository
+Clone this repository:
+```shell
+git clone git@github.com:sguimmara/authenticator.git
+```
+
+Build it using `cargo`
+
+```
+cargo build
+```
