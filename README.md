@@ -9,8 +9,18 @@ Clone this repository:
 git clone git@github.com:sguimmara/authenticator.git
 ```
 
-Build it using `cargo`
+Build it using `cargo`:
 
 ```
 cargo build
+cargo run -- <subcommand> [ARGS]
 ```
+
+Alternatively, you can build it using Docker :
+
+```
+docker build -t authenticator:example .
+docker run authenticator:example <subcommand> [ARGS]
+```
+
+> Note: the Docker image builds the binary against the musl libc (see https://musl.libc.org/)
