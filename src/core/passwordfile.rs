@@ -1,12 +1,15 @@
+use serde::{Deserialize, Serialize};
+use std::fs;
 use std::path::Path;
 
 /// Describes an entry in the [PasswordFile]
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Eq, PartialEq)]
 struct Entry {
     username: String,
     password_hash: String,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct PasswordFile {
     entries: Vec<Entry>,
 }
@@ -44,13 +47,29 @@ impl PasswordFile {
     }
 
     /// Saves the [PasswordFile] to the disk.
-    pub fn save(&self, path: &Path) {
-        unimplemented!()
+    pub fn save(&self, path: &Path) -> Result<(), String> {
+        match serde_json::to_string(self) {
+            Ok(json) => match fs::write(path, json) {
+                Ok(_) => Ok(()),
+                Err(err) => Err(format!(
+                    "could not save content of PasswordFile to {:?}: {}",
+                    path, err
+                )),
+            },
+            Err(err) => Err(format!("could not serialize PasswordFile to JSON: {}", err)),
+        }
     }
 
     /// Loads a [PasswordFile] from a file.
-    pub fn load(path: &Path) -> Self {
-        unimplemented!()
+    pub fn load(path: &Path) -> Result<PasswordFile, String> {
+        let content = fs::read_to_string(path);
+        match content {
+            Ok(json) => match serde_json::from_str(json.as_str()) {
+                Ok(data) => Ok(data),
+                Err(err) => Err(format!("could not parse PasswordFile: {}", err)),
+            },
+            Err(err) => Err(format!("could not load PasswordFile from {:?}: {}", path, err)),
+        }
     }
 }
 
@@ -70,5 +89,32 @@ mod test {
         let pf = PasswordFile::new();
 
         assert_eq!(0, pf.entries.len());
+    }
+
+    #[test]
+    fn serialization_then_deserialization() {
+        let path = std::path::Path::new("pwd.json");
+        std::fs::remove_file(path).unwrap_or(());
+
+        let mut p = PasswordFile::new();
+        let john = Entry::new("John", "dkazodkazdôkazd");
+        let irvin = Entry::new("Irvin", "adjadaz08519");
+        p.entries.push(john);
+        p.entries.push(irvin);
+
+        assert!(p.save(path).is_ok());
+
+        let load = PasswordFile::load(path);
+        match load {
+            Err(err) => println!("{}", err),
+            Ok(ok) => {
+                assert_eq!("John", ok.entries[0].username());
+                assert_eq!("dkazodkazdôkazd", ok.entries[0].password_hash());
+                assert_eq!("Irvin", ok.entries[1].username());
+                assert_eq!("adjadaz08519", ok.entries[1].password_hash());
+            }
+        }
+
+        std::fs::remove_file(path).unwrap();
     }
 }
