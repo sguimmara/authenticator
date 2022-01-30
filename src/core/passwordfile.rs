@@ -15,7 +15,7 @@ impl Entry {
     pub fn new(username: &str, password_hash: &str) -> Self {
         Self {
             username: username.into(),
-            password_hash: password_hash.into()
+            password_hash: password_hash.into(),
         }
     }
 
@@ -25,6 +25,13 @@ impl Entry {
 
     pub fn password_hash(&self) -> String {
         self.password_hash.clone()
+    }
+}
+
+impl Drop for Entry {
+    fn drop(&mut self) {
+        // reset password_hash to zeros to reduce risk of password leak from memory
+        self.password_hash().replace_range(0.., "0")
     }
 }
 
@@ -49,7 +56,7 @@ impl PasswordFile {
 
 #[cfg(test)]
 mod test {
-    use super::{PasswordFile, Entry};
+    use super::{Entry, PasswordFile};
 
     #[test]
     fn entry_new_assigns_correct_values() {
