@@ -46,6 +46,19 @@ impl PasswordFile {
         }
     }
 
+    pub fn enumerate(&self) -> Vec<(String, String)> {
+        let mut result = Vec::new();
+        for elem in &self.entries {
+            result.push((elem.username(), elem.password_hash()));
+        }
+        result
+    }
+
+    pub fn add_user(&mut self, user: &str, password_hash: &str) {
+        let entry = Entry::new(user, password_hash);
+        self.entries.push(entry);
+    }
+
     /// Saves the [PasswordFile] to the disk.
     pub fn save(&self, path: &Path) -> Result<(), String> {
         match serde_json::to_string(self) {
