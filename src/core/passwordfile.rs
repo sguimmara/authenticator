@@ -81,7 +81,10 @@ impl PasswordFile {
                 Ok(data) => Ok(data),
                 Err(err) => Err(format!("could not parse PasswordFile: {}", err)),
             },
-            Err(err) => Err(format!("could not load PasswordFile from {:?}: {}", path, err)),
+            Err(err) => Err(format!(
+                "could not load PasswordFile from {:?}: {}",
+                path, err
+            )),
         }
     }
 }

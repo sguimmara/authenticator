@@ -9,9 +9,7 @@ pub fn hash(text: &str) -> String {
 
     let result = hasher.finalize();
 
-    let h = hex::encode(result);
-
-    return h;
+    hex::encode(result)
 }
 
 #[cfg(test)]
