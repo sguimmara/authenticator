@@ -41,3 +41,11 @@ This command computes then returns the SHA-256 hash of the supplied text.
 $ authenticator hash "hello, world!"
 SHA-256 of "hello, world!": 68e656b251e67e8358bef8483ab0d51c6619f3e7a1a9f0e75838d41ff368f728
 ```
+
+### `entries` subcommand
+
+This command list the entries (as user/password hash tuples) in the `pwd.json` file located in the current directory.
+
+### `adduser` subcommand
+
+Adds a (user, password) tuple to the current `pwd.json` file if any. If it does not exist, a file is created.

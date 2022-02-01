@@ -1,5 +1,7 @@
 use sha2::{Digest, Sha256};
 
+pub mod passwordfile;
+
 pub fn hash(text: &str) -> String {
     let mut hasher = Sha256::new();
 
