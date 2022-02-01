@@ -45,17 +45,7 @@ fn main() {
             println!("SHA-256 of \"{}\": {}", text, core::hash(text));
         },
         Some(("entries", _)) => {
-            let users = pw.enumerate();
-            if users.len() == 0 {
-                println!("the password file has no users.");
-            } else {
-                println!("the file contains the following users:");
-                let mut index = 1;
-                for (user, hash) in users {
-                    println!("#{: >2} {: >15} (password hash: {})", index, user, hash);
-                    index += 1;
-                }
-            }
+            show_entries(&pw);
         },
         Some(("adduser", sub_matches)) => {
             match (sub_matches.value_of("USER"), sub_matches.value_of("PWD")) {
@@ -69,6 +59,20 @@ fn main() {
     match pw.save(path) {
         Ok(()) => println!("saved password file to {}", PASSWORD_PATH),
         Err(err) => println!("{}", err)
+    }
+}
+
+fn show_entries(file: &PasswordFile) {
+    let users = file.enumerate();
+    if users.len() == 0 {
+        println!("the password file has no users.");
+    } else {
+        println!("the file contains the following users:");
+        let mut index = 1;
+        for (user, hash) in users {
+            println!("#{: >2} {: >15} (password hash: {})", index, user, hash);
+            index += 1;
+        }
     }
 }
 
