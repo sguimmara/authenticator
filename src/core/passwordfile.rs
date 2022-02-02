@@ -59,6 +59,10 @@ impl PasswordFile {
         self.entries.push(entry);
     }
 
+    pub fn remove_user(&mut self, user: &str) {
+        self.entries.retain(|x| x.username().ne(user));
+    }
+
     /// Saves the [PasswordFile] to the disk.
     pub fn save(&self, path: &Path) -> Result<(), String> {
         match serde_json::to_string(self) {
@@ -105,6 +109,19 @@ mod test {
         let pf = PasswordFile::new();
 
         assert_eq!(0, pf.entries.len());
+    }
+
+    #[test]
+    fn remove_user() {
+        let mut pw = PasswordFile::new();
+        pw.add_user("foo", "bar");
+        pw.add_user("baz", "quux");
+
+        pw.remove_user("foo");
+
+        assert_eq!(1, pw.enumerate().len());
+        assert_eq!("baz", pw.enumerate()[0].0);
+        assert_eq!("quux", pw.enumerate()[0].1);
     }
 
     #[test]

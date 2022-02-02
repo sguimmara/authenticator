@@ -49,3 +49,7 @@ This command list the entries (as user/password hash tuples) in the `pwd.json` f
 ### `adduser` subcommand
 
 Adds a (user, password) tuple to the current `pwd.json` file if any. If it does not exist, a file is created.
+
+### `removeuser` subcommand
+
+Removes a user from the current `pwd.json` file if any.

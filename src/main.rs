@@ -20,9 +20,15 @@ fn main() {
         .subcommand(App::new("entries").about("list entries in the password file"))
         .subcommand(
             App::new("adduser")
-                .about("add or update a user in the password file")
+                .about("adds user in the password file")
                 .arg(arg!(<USER> "the user name"))
                 .arg(arg!(<PWD> "the user password"))
+                .setting(AppSettings::ArgRequiredElseHelp),
+        )
+        .subcommand(
+            App::new("removeuser")
+                .about("removes a user from the password file")
+                .arg(arg!(<USER> "the user name"))
                 .setting(AppSettings::ArgRequiredElseHelp),
         )
         .get_matches();
@@ -56,6 +62,10 @@ fn main() {
                 _ => println!("usage: adduser <USER> <PWD>"),
             }
         }
+        Some(("removeuser", sub_matches)) => match sub_matches.value_of("USER") {
+            Some(user) => remove_user(&mut pw, user),
+            _ => println!("usage: removeuser <USER>"),
+        },
         _ => unreachable!(),
     }
 
@@ -77,6 +87,11 @@ fn show_entries(file: &PasswordFile) {
             index += 1;
         }
     }
+}
+
+fn remove_user(file: &mut PasswordFile, user: &str) {
+    file.remove_user(user);
+    println!("removed user {}", user);
 }
 
 fn add_user(file: &mut PasswordFile, user: &str, password: &str) {
