@@ -53,3 +53,7 @@ Adds a (user, password) tuple to the current `pwd.json` file if any. If it does 
 ### `removeuser` subcommand
 
 Removes a user from the current `pwd.json` file if any.
+
+### `verify` subcommand
+
+Verifies that the user/password pair matches an entry in the `pwd.json` file.
