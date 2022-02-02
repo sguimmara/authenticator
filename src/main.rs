@@ -4,6 +4,7 @@ use log::{error, info};
 mod core;
 
 use self::core::passwordfile::PasswordFile;
+use self::core::CredentialFailure;
 
 fn main() {
     env_logger::init();
@@ -29,6 +30,13 @@ fn main() {
             App::new("removeuser")
                 .about("removes a user from the password file")
                 .arg(arg!(<USER> "the user name"))
+                .setting(AppSettings::ArgRequiredElseHelp),
+        )
+        .subcommand(
+            App::new("verify")
+                .about("verify that the user and password match the values in the password file")
+                .arg(arg!(<USER> "the user name"))
+                .arg(arg!(<PWD> "the user password"))
                 .setting(AppSettings::ArgRequiredElseHelp),
         )
         .get_matches();
@@ -66,6 +74,12 @@ fn main() {
             Some(user) => remove_user(&mut pw, user),
             _ => println!("usage: removeuser <USER>"),
         },
+        Some(("verify", sub_matches)) => {
+            match (sub_matches.value_of("USER"), sub_matches.value_of("PWD")) {
+                (Some(user), Some(pwd)) => verify_user(&pw, user, pwd),
+                _ => println!("usage: adduser <USER> <PWD>"),
+            }
+        }
         _ => unreachable!(),
     }
 
@@ -98,4 +112,13 @@ fn add_user(file: &mut PasswordFile, user: &str, password: &str) {
     let hash = core::hash(password);
     println!("adding user {} (password hash: {})", user, hash);
     file.add_user(user, hash.as_str());
+}
+
+fn verify_user(file: &PasswordFile, user: &str, password: &str) {
+    let hash = core::hash(password);
+    match file.verify_credentials(user, &hash) {
+        Ok(()) => println!("credentials valid!"),
+        Err(CredentialFailure::InvalidPassword) => println!("invalid password!"),
+        Err(CredentialFailure::UnknownUser) => println!("unknown user: {}", user),
+    }
 }

@@ -2,6 +2,12 @@ use sha2::{Digest, Sha256};
 
 pub mod passwordfile;
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum CredentialFailure {
+    UnknownUser,
+    InvalidPassword,
+}
+
 pub fn hash(text: &str) -> String {
     let mut hasher = Sha256::new();
 

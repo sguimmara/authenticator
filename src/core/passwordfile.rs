@@ -1,3 +1,4 @@
+use crate::CredentialFailure;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
@@ -63,6 +64,27 @@ impl PasswordFile {
         self.entries.retain(|x| x.username().ne(user));
     }
 
+    pub fn verify_credentials(
+        &self,
+        user: &str,
+        password_hash: &str,
+    ) -> Result<(), CredentialFailure> {
+        match self.get_user(user) {
+            Some(user) => {
+                if user.password_hash() == password_hash {
+                    Ok(())
+                } else {
+                    Err(CredentialFailure::InvalidPassword)
+                }
+            }
+            None => Err(CredentialFailure::UnknownUser),
+        }
+    }
+
+    fn get_user(&self, user: &str) -> Option<&Entry> {
+        self.entries.iter().find(|&x| x.username() == user)
+    }
+
     /// Saves the [PasswordFile] to the disk.
     pub fn save(&self, path: &Path) -> Result<(), String> {
         match serde_json::to_string(self) {
@@ -95,6 +117,7 @@ impl PasswordFile {
 
 #[cfg(test)]
 mod test {
+    use super::CredentialFailure;
     use super::{Entry, PasswordFile};
 
     #[test]
@@ -122,6 +145,18 @@ mod test {
         assert_eq!(1, pw.enumerate().len());
         assert_eq!("baz", pw.enumerate()[0].0);
         assert_eq!("quux", pw.enumerate()[0].1);
+    }
+
+    #[test]
+    fn verify_credentials() {
+        let mut pw = PasswordFile::new();
+        pw.add_user("foo", "bar");
+        pw.add_user("baz", "quux");
+
+        assert_eq!(Ok(()), pw.verify_credentials("foo", "bar"));
+        assert_eq!(Ok(()), pw.verify_credentials("baz", "quux"));
+        assert_eq!(Err(CredentialFailure::InvalidPassword), pw.verify_credentials("baz", "WRONG"));
+        assert_eq!(Err(CredentialFailure::UnknownUser), pw.verify_credentials("UNKNOWN", "whatever"));
     }
 
     #[test]
