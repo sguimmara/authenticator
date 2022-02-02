@@ -20,7 +20,7 @@ fn main() {
         .subcommand(App::new("entries").about("list entries in the password file"))
         .subcommand(
             App::new("adduser")
-                .about("add or update a user in the password file")
+                .about("adds user in the password file")
                 .arg(arg!(<USER> "the user name"))
                 .arg(arg!(<PWD> "the user password"))
                 .setting(AppSettings::ArgRequiredElseHelp),
