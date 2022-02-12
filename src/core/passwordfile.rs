@@ -155,8 +155,14 @@ mod test {
 
         assert_eq!(Ok(()), pw.verify_credentials("foo", "bar"));
         assert_eq!(Ok(()), pw.verify_credentials("baz", "quux"));
-        assert_eq!(Err(CredentialFailure::InvalidPassword), pw.verify_credentials("baz", "WRONG"));
-        assert_eq!(Err(CredentialFailure::UnknownUser), pw.verify_credentials("UNKNOWN", "whatever"));
+        assert_eq!(
+            Err(CredentialFailure::InvalidPassword),
+            pw.verify_credentials("baz", "WRONG")
+        );
+        assert_eq!(
+            Err(CredentialFailure::UnknownUser),
+            pw.verify_credentials("UNKNOWN", "whatever")
+        );
     }
 
     #[test]
