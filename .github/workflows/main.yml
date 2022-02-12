@@ -15,6 +15,13 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: lint
+        run: cargo fmt --check
+
   test:
     runs-on: ubuntu-latest    
     steps:
