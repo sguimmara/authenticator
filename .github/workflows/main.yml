@@ -20,18 +20,32 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: lint
-        run: cargo fmt --check
+        run: make fmt
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: clippy
+        run: make lint
 
   test:
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2
       - name: test
-        run: cargo test
+        run: make test
 
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: build release
-        run: cargo build --release
+        run: make docker-build
+
+  docker-linux:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v2
+        - name: build release
+          run: make docker
